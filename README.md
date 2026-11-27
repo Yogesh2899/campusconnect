@@ -19,6 +19,7 @@ CampusConnect is a web-based academic appointment scheduling system designed to 
 - [Development Methodology](#-development-methodology)
 - [Future Enhancements](#-future-enhancements)
 - [Project Team](#-project-team)
+- [Individual Journals](#individual-journals)
 
 ## 📖 Overview
 
@@ -248,6 +249,12 @@ Developed as part of the **UCS503 – Software Engineering Lab** project at Thap
 **Submitted to:** Stuti Chugh
 
 **Department:** Computer Science and Engineering
+
+## Individual Journals
+
+- [Yogesh Goyal](journals/1024031015-yogesh/index.md) — Testing, security and documentation
+- [Rakshit Chaudhary](journals/1024031011-rakshit/index.md) — Frontend
+- [Tanish Kumar Singla](journals/1024030759-tanish/index.md) — Backend
 
 ---
 
