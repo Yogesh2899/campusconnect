@@ -1,8 +1,8 @@
-# MeetSync – Professor–Student Meeting Scheduler
+# CampusConnect – Professor–Student Meeting Scheduler
 
 **Synchronizing Students and Professors**
 
-MeetSync is a web-based academic appointment scheduling system designed to simplify and organize consultations between students and professors. It provides a centralized platform for managing professor availability, requesting meetings, handling approvals, preventing scheduling conflicts, and sending automated notifications.
+CampusConnect is a web-based academic appointment scheduling system designed to simplify and organize consultations between students and professors. It provides a centralized platform for managing professor availability, requesting meetings, handling approvals, preventing scheduling conflicts, and sending automated notifications.
 
 ## 📌 Table of Contents
 
@@ -24,7 +24,7 @@ MeetSync is a web-based academic appointment scheduling system designed to simpl
 
 Traditional academic meeting scheduling often relies on emails and informal messages, resulting in communication delays, unclear availability, and scheduling conflicts.
 
-MeetSync aims to replace this manual process with an organized digital solution. Students can view available consultation slots and submit meeting requests, while professors can manage their schedules and respond to requests through a centralized platform.
+CampusConnect aims to replace this manual process with an organized digital solution. Students can view available consultation slots and submit meeting requests, while professors can manage their schedules and respond to requests through a centralized platform.
 
 The system also maintains meeting statuses and provides notifications for important events, including booking requests, approvals, rejections, rescheduling, and cancellations.
 
@@ -40,7 +40,7 @@ The conventional professor–student meeting scheduling process faces several ch
 - Manual tracking of appointments and meeting history.
 - Additional administrative workload for faculty.
 
-MeetSync addresses these challenges by introducing a centralized, automated appointment management system.
+CampusConnect addresses these challenges by introducing a centralized, automated appointment management system.
 
 ## 🎯 Objectives
 
@@ -202,7 +202,7 @@ The project follows a structured Software Engineering approach, with documentati
 - **Level 1:** Decomposes the system into authentication and profile management, faculty availability management, meeting scheduling, and notification management.
 - **Level 2:** Provides further decomposition of authentication, meeting management, availability management, and notification processes.
 
-These artifacts establish the documented requirements and design of MeetSync.
+These artifacts establish the documented requirements and design of CampusConnect.
 
 ## 🔁 Development Methodology
 
@@ -253,4 +253,4 @@ Developed as part of the **UCS503 – Software Engineering Lab** project at Thap
 
 ⭐ If you find this project interesting, consider starring the repository!
 
-**MeetSync — Making academic consultations simpler, smarter, and more organized.**
+**CampusConnect — Making academic consultations simpler, smarter, and more organized.**
