@@ -1,0 +1,7 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "nextjs",
+  "installCommand": "npx --yes pnpm@12.3.4 install --frozen-lockfile",
+  "buildCommand": "if [ \"$VERCEL_ENV\" = production ]; then DATABASE_URL=\"${DATABASE_URL_UNPOOLED:-$DATABASE_URL}\" npm exec -- prisma migrate deploy || exit 1; fi; npm run build",
+  "crons": [{ "path": "/api/campus/roster", "schedule": "0 5 * * *" }]
+}

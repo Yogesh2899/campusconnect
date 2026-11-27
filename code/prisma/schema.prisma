@@ -1,0 +1,291 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  STUDENT
+  TEACHER
+  ADMIN
+}
+
+model User {
+  id            String              @id @default(cuid())
+  name          String
+  email         String              @unique
+  emailVerified Boolean             @default(false)
+  image         String?
+  role          Role                @default(STUDENT)
+  suspended     Boolean             @default(false)
+  deletedAt     DateTime?
+  adminVerifiedAt DateTime?
+  createdAt     DateTime            @default(now())
+  updatedAt     DateTime            @updatedAt
+  accounts      Account[]
+  sessions      Session[]
+  student       StudentProfile?
+  teacher       TeacherProfile?
+  invitations   TeacherInvitation[]
+  events        AuditLog[]
+  slots         CampusSlot[]
+  meetings      CampusMeeting[]
+  notices       CampusNotice[]
+  savedFaculty  SavedFaculty[]
+  announcements CampusAnnouncement[]
+  meetingMessages CampusMessage[]
+  blocks        CampusBlock[]
+  scheduledStudents ScheduledStudent[]
+}
+
+model ScheduledStudent {
+  id          String   @id @default(cuid())
+  email       String   @unique
+  studentId   String   @unique
+  name        String
+  year        Int
+  department  String?
+  scheduledBy String
+  scheduler   User     @relation(fields: [scheduledBy], references: [id], onDelete: Restrict)
+  scheduledAt DateTime
+  processedAt DateTime?
+  outcome     String?
+  @@index([processedAt, scheduledAt])
+}
+
+model Session {
+  id        String   @id
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model Account {
+  id                    String    @id @default(cuid())
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@unique([providerId, accountId])
+  @@index([userId])
+}
+
+model Verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([identifier])
+}
+
+model RateLimit {
+  id          String @id
+  key         String @unique
+  count       Int
+  lastRequest BigInt
+}
+
+model Department {
+  id          String              @id @default(cuid())
+  name        String              @unique
+  students    StudentProfile[]
+  teachers    TeacherProfile[]
+  invitations TeacherInvitation[]
+  announcements CampusAnnouncement[]
+}
+
+model StudentProfile {
+  userId              String     @id
+  user                User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  studentId           String     @unique
+  departmentId        String?
+  department          Department? @relation(fields: [departmentId], references: [id], onDelete: Restrict)
+  year                Int
+  directoryVerifiedAt DateTime?
+}
+
+model TeacherProfile {
+  userId       String     @id
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  employeeId   String     @unique
+  departmentId String
+  department   Department @relation(fields: [departmentId], references: [id])
+  designation  String
+}
+
+model TeacherInvitation {
+  id           String     @id @default(cuid())
+  tokenHash    String     @unique
+  name         String
+  email        String     @unique
+  employeeId   String     @unique
+  departmentId String
+  department   Department @relation(fields: [departmentId], references: [id])
+  designation  String
+  issuedBy     String
+  issuer       User       @relation(fields: [issuedBy], references: [id])
+  expiresAt    DateTime
+  consumedAt   DateTime?
+  createdAt    DateTime   @default(now())
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  actorId   String?
+  actor     User?    @relation(fields: [actorId], references: [id], onDelete: SetNull)
+  action    String
+  targetId  String?
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+}
+
+model StudentChallenge {
+  email     String   @id
+  digest    String
+  expiresAt DateTime
+  sentAt    DateTime @default(now())
+  attempts  Int      @default(0)
+}
+
+model DcseFaculty {
+  email       String @id
+  name        String
+  designation String
+  office      String
+  floor       Int
+  savedBy     SavedFaculty[]
+  @@index([floor, name])
+}
+
+model DcseResponsibility {
+  id          Int @id
+  topic       String
+  coordinator String
+  emails      String[]
+  @@index([topic])
+}
+
+enum MeetingStatus {
+  PENDING
+  CONFIRMED
+  PROPOSED
+  DECLINED
+  CANCELLED
+  COMPLETED
+  NO_SHOW
+}
+
+model CampusSlot {
+  id        String @id @default(cuid())
+  teacherId String
+  teacher   User   @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+  startAt   DateTime
+  endAt     DateTime
+  closed    Boolean @default(false)
+  meetings  CampusMeeting[]
+  proposal  CampusMeeting? @relation("ProposedSlot")
+  @@unique([teacherId, startAt])
+  @@index([startAt])
+}
+
+model CampusMeeting {
+  id         String @id @default(cuid())
+  slotId     String
+  slot       CampusSlot @relation(fields: [slotId], references: [id])
+  proposedSlotId String? @unique
+  proposedSlot CampusSlot? @relation("ProposedSlot", fields: [proposedSlotId], references: [id], onDelete: SetNull)
+  proposalBy Role?
+  returnStatus MeetingStatus?
+  proposedLocation String?
+  studentId  String
+  student    User @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  subject    String
+  details    String
+  location   String?
+  status     MeetingStatus @default(PENDING)
+  createdAt  DateTime @default(now())
+  notes      String?
+  rating     Int?
+  feedback   String?
+  feedbackAt DateTime?
+  messages   CampusMessage[]
+  @@index([slotId, status])
+  @@index([studentId, status])
+}
+
+model CampusNotice {
+  id        String @id @default(cuid())
+  userId    String
+  user      User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  message   String
+  readAt    DateTime?
+  createdAt DateTime @default(now())
+  @@index([userId, createdAt])
+}
+
+model SavedFaculty {
+  userId       String
+  user         User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  facultyEmail String
+  faculty      DcseFaculty @relation(fields: [facultyEmail], references: [email], onDelete: Cascade)
+  @@id([userId, facultyEmail])
+}
+
+model CampusAnnouncement {
+  id           String @id @default(cuid())
+  authorId     String
+  author       User @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  departmentId String
+  department   Department @relation(fields: [departmentId], references: [id])
+  title        String
+  body         String
+  createdAt    DateTime @default(now())
+  archivedAt   DateTime?
+  @@index([departmentId, createdAt])
+}
+
+model CampusBlock {
+  id        String   @id @default(cuid())
+  teacherId String
+  teacher   User     @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+  startAt   DateTime
+  endAt     DateTime
+  reason    String?
+  @@index([teacherId, startAt])
+}
+
+model CampusMessage {
+  id        String @id @default(cuid())
+  meetingId String
+  meeting   CampusMeeting @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  senderId  String
+  sender    User @relation(fields: [senderId], references: [id])
+  body      String
+  createdAt DateTime @default(now())
+  @@index([meetingId, createdAt])
+}
+
